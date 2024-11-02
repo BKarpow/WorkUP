@@ -1,4 +1,5 @@
 #pragma once
+#include <Arduino.h>
 
 
 class WorkUP {
@@ -16,7 +17,7 @@ class WorkUP {
       return s;
     }
   public:
-    WorkUp() {
+    WorkUP() {
       _speed = 1;
     }
 
@@ -84,6 +85,14 @@ class WorkUP {
       return s;
     }
 
+    String strfWorkUpTime(String format = "%d %h:%m:%s") {
+      format.replace("%d", String(getDays()) );
+      format.replace("%h", String(getHours()) );
+      format.replace("%m", String(getMinutes()) );
+      format.replace("%s", String(getSecunds()) );
+      return format;
+    }
+
     bool tick() {
       if (_run && !_pause && millis() - _tmr >= 1000ul) {
         _tmr = millis();
@@ -94,3 +103,4 @@ class WorkUP {
     }
 };
 
+extern WorkUP WUP;
