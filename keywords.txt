@@ -1,0 +1,22 @@
+#######################################
+# Syntax Coloring Map For FastBot2
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+WorkUP	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+strfWorkUpTime KEYWORD2
+getSecunds KEYWORD2
+getMinutes KEYWORD2
+getHours KEYWORD2
+getDays KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
