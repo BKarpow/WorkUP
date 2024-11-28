@@ -6,6 +6,7 @@ class WorkUP {
   private:
     uint32_t _up;
     uint32_t _tmr;
+    uint32_t _periodTimer;
     uint16_t _speed;
     bool _run;
     bool _pause;
@@ -16,9 +17,28 @@ class WorkUP {
       else s = String(t);
       return s;
     }
+
+    uint32_t divideBy24(uint32_t x) {
+        return (x * 178956970u) >> 32; // Множник для ділення на 24
+    }
+
+    uint32_t divideBy60(uint32_t x) {
+        return (x * 0x8889) >> 19; // Швидке ділення на 60
+    }
+
+    uint32_t remainderBy60(uint32_t x) {
+        uint32_t quotient = divideBy60(x);
+        return x - (quotient * 60); // Залишок від ділення
+    }
+
+    uint32_t remainderBy24(uint32_t x) {
+        uint32_t quotient = divideBy24(x);
+        return x - (quotient * 24); // Залишок від ділення
+    }
   public:
     WorkUP() {
       _speed = 1;
+      _periodTimer = 1000;
     }
 
     void setSpeed(uint8_t speed) {
@@ -47,19 +67,27 @@ class WorkUP {
     }
 
     uint8_t getSecunds() {
-      return _up % 60;
+      return remainderBy60(_up);
     }
 
     uint8_t getMinutes() {
-      return (_up / 60) % 60;
+      uint32_t res = divideBy60(_up);
+      res = remainderBy60(res);
+      return (uint8_t)res;
     }
 
     uint8_t getHours() {
-      return (_up / 60 / 60) % 24;
+      uint32_t res = divideBy60(_up);
+      res = divideBy60(res);
+      res = remainderBy24(res);
+      return (uint8_t)res;
     }
 
     uint16_t getDays() {
-      return (_up / 60 / 60 / 24);
+      uint32_t res = divideBy60(_up);
+      res = divideBy60(res);
+      res = divideBy24(res);
+      return (uint16_t)res;
     }
 
     uint32_t getUpSecunds() {
@@ -67,11 +95,11 @@ class WorkUP {
     }
 
     uint32_t getUpMinutes() {
-      return _up / 60;
+      return divideBy60(_up);
     }
 
     uint32_t getUpHours() {
-      return getUpMinutes() / 60;
+      return divideBy60(getUpMinutes());
     }
 
     String getUpString() {
@@ -93,13 +121,15 @@ class WorkUP {
       return format;
     }
 
-    bool tick() {
-      if (_run && !_pause && millis() - _tmr >= 1000ul) {
-        _tmr = millis();
+    void tick() {
+      if (millis() - _tmr > _periodTimer) {
+        // _tmr = millis();
         _up += _speed;
-        return true;
+        do {
+          _tmr += _periodTimer;
+          if (_tmr < _periodTimer) break;
+        } while (_tmr < millis() - _periodTimer);
       } 
-      return false;
     }
 };
 
